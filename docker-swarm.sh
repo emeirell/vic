@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x #echo on
+#set -x #echo on
 
 # vars
 [ -z "$NUM_WORKERS" ] && NUM_WORKERS=2
