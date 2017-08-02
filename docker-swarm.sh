@@ -1,11 +1,12 @@
 #!/bin/bash
-#set -x #echo on
+set -x #echo on
 
 # vars
 [ -z "$NUM_WORKERS" ] && NUM_WORKERS=2
+CONTAINER_NET="vic-container"
 
 # init swarm master
-docker run -d --net "vic-container" --name manager-1 vmware/dinv:1.13
+docker run -d --net $CONTAINER_NET --name manager-1 vmware/dinv:1.13
 
 # get swarm master IP
 SWARM_MASTER=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' manager-1)
@@ -21,10 +22,11 @@ for i in $(seq "${NUM_WORKERS}"); do
 
   # run new worker container
   docker run -d --name worker-${i} --hostname=worker-${i} \
-    --net "vic-container" \
+    --net $CONTAINER_NET \
     vmware/dinv:1.13
   
   # add worker container to the cluster
+  #for w in $(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq))
   for w in $(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' worker-${i})
   do
 
