@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x #echo on
+#set -x #echo on
 
 # vars
 [ -z "$NUM_WORKERS" ] && NUM_WORKERS=2
@@ -25,7 +25,6 @@ for i in $(seq "${NUM_WORKERS}"); do
     vmware/dinv:1.13
   
   # add worker container to the cluster
-  #for w in $(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq))
   for w in $(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' worker-${i})
   do
 
