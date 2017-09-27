@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## USER-DEFINED VARIABLES
-# Number of sarm workers desired
+# Number of swarm workers desired
 NUM_WORKERS=3
 # name of routable (external) network
 # this needs to be defined on your VCH using the '--container-network' option
@@ -18,7 +18,10 @@ docker pull $DCH_IMAGE
 # create a docker volume for the master image cache
 docker volume create --opt Capacity=10GB --name registrycache
 # create and run the master instance
-docker run -d -v registrycache:/var/lib/docker --net $CONTAINER_NET --name manager1 --hostname=manager1 $DCH_IMAGE
+docker run -d -v registrycache:/var/lib/docker \
+  --net $CONTAINER_NET \
+  --name manager1 --hostname=manager1 \
+  $DCH_IMAGE
 # get the master IP
 SWARM_MASTER=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' manager1)
 # create the new swarm on the master
@@ -34,7 +37,10 @@ for i in $(seq "${NUM_WORKERS}"); do
   # create docker volumes for each worker to be used as image cache
   docker volume create  --opt Capacity=10GB --name worker-vol${i}
   # run new worker container
-  docker run -d -v worker-vol${i}:/var/lib/docker --name worker${i} --hostname=worker${i} --net $CONTAINER_NET $DCH_IMAGE  
+  docker run -d -v worker-vol${i}:/var/lib/docker \
+    --net $CONTAINER_NET \
+    --name worker${i} --hostname=worker${i}  \
+    $DCH_IMAGE  
   # wait for daemon to start
   sleep 10
 
